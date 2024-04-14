@@ -24,12 +24,32 @@ abstract contract MintingCost{} implement a cost in ETH which must be paid in or
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
 
-import "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-contracts/contracts/access/Ownable.sol";
-import "src/BurnOnTx.sol";
+import "BurnOnTx.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+
+/* 
+abstract contract erc20 is IERC20 {
+    function _update{}
+}
+
+abstract contract burnOnTx is ERC20 {
+
+}
+
+contract MyToken is BurnOnTX {
+    constructor(ERC20 args, BurnOnTx args)
+}
+
+My token needs to have:
+
+Burn Fee
+Staking/InflateOnStake
 
 
+
+*/
 
 contract MyToken is ERC20, BurnOnTx {
 
@@ -83,3 +103,24 @@ contract CallumCoin is ERC20, BurnOnTx, InflateWithStake, DemurrageFee {
 
 
 */
+
+// erc20 already imported
+contract Component1 {
+    // burn tokens
+    ERC20 private erc20;
+    function doBurn(address from, uint256 value, uint256 burnAmount) internal virtual returns (uint256) {
+        uint256 newValue = value - burnAmount;
+        erc20._burn(from, burnAmount);
+        return newValue;
+    }
+}
+
+
+contract MyToken2 is ERC20, Component2 {
+    Component1 private component1;
+    uint256 burnAmount = 20;
+    function _transfer(address from, address to, uint256 value, uint256 burnAmount) internal virtual override {
+        uint256 newValue = component1.doBurn(from, value, burnAmount);
+        super._update(from, to, newValue);
+    }
+}
