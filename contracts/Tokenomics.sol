@@ -106,7 +106,7 @@ contract CallumCoin is ERC20, BurnOnTx, InflateWithStake, DemurrageFee {
 
 
 
-
+/*
 contract MyToken2 is ERC20 {
     Component1 private component1;
     uint256 public burnAmount = 20;
@@ -115,3 +115,4 @@ contract MyToken2 is ERC20 {
         _update(from, to, newValue);
     }
 }
+*/
