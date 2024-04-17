@@ -31,7 +31,7 @@ Start with a basic stake + mint contract where a depositor can accrue rewards
 
 pragma solidity ^0.8.3;
 
-import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
 abstract contract InflateOnStake {
 

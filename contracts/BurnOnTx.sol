@@ -1,13 +1,14 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.3;
+pragma solidity ^0.8.20;
 
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-
-contract BurnOnTx {
+abstract contract BurnOnTx {
     // burn tokens
-    ERC20 private erc20;
     uint256 public burnRate;
+
     constructor(uint256 _burnRate) {
         burnRate = _burnRate;
     }
@@ -19,7 +20,7 @@ contract BurnOnTx {
 
     function doBurn(address from, uint256 value, uint256 burnAmount) internal virtual returns (uint256) {
         uint256 newValue = value - burnAmount;
-        erc20._burn(from, burnAmount);
+        //erc20._burn(from, burnAmount);
         return newValue;
     }
 }

@@ -1,58 +1,11 @@
-/*
-implement economic functionality via interfaces/contracts/abstracts?
-To implement:
-abstract contract Demurrage {uint256 demurrageTime;} periodically tax tokens based on block height
-abstract contract InflateOnStake {} allow tokens to be minted via a lock up mechanism, thereby causing inflation
-abstract contract VestingSchedule {} creates a vesting schedule, where a set of authorised users may mint new tokens
-abstract contract BurnOnTx {} Burn a portion of the transaction amount
-abstract contract MintingCost{} implement a cost in ETH which must be paid in order to mint
-
- - Demurrage
- - Inflation
- - Lock-up
- - Staking
- - Inactivity penalty
- - Inactivity incentive
- - Supply burn
- - Exchange rate, minting cost, backing
- - Permissioned currency
- - Tax  
- - Special cases
- - Blacklisting, whitelisting
-*/
-
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.3;
+pragma solidity ^0.8.20;
 
 import "src/contracts/BurnOnTx.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
-
-
-
-/*
-abstract contract erc20 is IERC20 {
-    function _update{}
-}
-
-abstract contract burnOnTx is ERC20 {
-
-}
-
-contract MyToken is BurnOnTX {
-    constructor(ERC20 args, BurnOnTx args)
-}
-
-My token needs to have:
-
-Burn Fee
-Staking/InflateOnStake
-
-
-
-*/
 
 contract MyToken is ERC20, BurnOnTx {
 
@@ -79,9 +32,13 @@ contract MyToken is ERC20, BurnOnTx {
     function decimals() public view override returns (uint8) {
         return decimalPlaces;
     }
-
-
 }
+
+/*
+inflate on stake (ERC20 token)
+stake(token)
+mint(token)
+*/
 
 /*
 Ideal final state:
