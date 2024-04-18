@@ -7,7 +7,7 @@ import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
-contract MyToken is ERC20, BurnOnTx, Demurrage {
+contract MyToken is BurnOnTx, Demurrage {
 
     event contractCreated(address creator,uint totalSupply);
 
@@ -24,8 +24,9 @@ contract MyToken is ERC20, BurnOnTx, Demurrage {
         address taxAddress
         ) 
         BurnOnTx(_initialBurnRate)
-        ERC20(_name, _symbol) 
         Demurrage(taxAddress)
+        ERC20(_name, _symbol) 
+        
         {
             decimalPlaces = _decimals;
             _mint(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, _initialSupply*10**decimals()/2);
@@ -37,17 +38,15 @@ contract MyToken is ERC20, BurnOnTx, Demurrage {
     function decimals() public view override returns (uint8) {
         return decimalPlaces;
     }
+    function transfer(address to, uint256 amount) public override(BurnOnTx, ERC20) returns (bool) {
+        BurnOnTx.transfer(to, amount);
+        return true;
+    }
 }
 
-/*
-inflate on stake (ERC20 token)
-stake(token)
-mint(token)
-*/
 
 /*
 Ideal final state:
-
 contract CallumCoin is ERC20, BurnOnTx, InflateWithStake, DemurrageFee {
 
     constructor(
@@ -60,21 +59,6 @@ contract CallumCoin is ERC20, BurnOnTx, InflateWithStake, DemurrageFee {
 
     function mySpecialFunction() public onlyOwner {
         burnOnTx.activated = False;
-    }
-}
-
-
-*/
-
-
-
-/*
-contract MyToken2 is ERC20 {
-    Component1 private component1;
-    uint256 public burnAmount = 20;
-    function _transfer(address from, address to, uint256 value) internal virtual override {
-        uint256 newValue = component1.doBurn(from, value, burnAmount);
-        _update(from, to, newValue);
     }
 }
 */

@@ -6,21 +6,20 @@ import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 abstract contract BurnOnTx is ERC20 {
-    // burn tokens
     uint256 public burnRate;
 
-    constructor(uint256 _burnRate) {
+    constructor(uint256 _burnRate){
         burnRate = _burnRate;
     }
-    
+
     function setBurnRate(uint256 _newRate) public {
         // Add your access control logic here (e.g., onlyOwner)
         burnRate = _newRate;
     }
-
-    function doBurn(address from, uint256 value, uint256 burnAmount) internal virtual returns (uint256) {
-        uint256 newValue = value - burnAmount;
-        _burn(from, burnAmount);
-        return newValue;
+    
+    function transfer(address to, uint256 value) public override virtual returns (bool) {        
+        uint256 newValue = value - burnRate;
+        _burn(msg.sender, burnRate);
+        return super.transfer(to, newValue);
     }
 }
