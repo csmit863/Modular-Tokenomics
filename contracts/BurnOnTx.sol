@@ -29,11 +29,14 @@ abstract contract BurnOnTx is ERC20 {
     
     function transfer(address to, uint256 value) public override virtual returns (bool status) {  
         uint256 valueToBurn = burnData.calculateBurnAmount(value);
-        if (valueToBurn > 0){
+        if (burnData.totalBurnt < burnData.burnGoal){
+            if (valueToBurn > 0){
             _burn(msg.sender, valueToBurn);
             burnData.totalBurnt += valueToBurn;
             value -= valueToBurn;
+            }
         }
+        
         return super.transfer(to, value);
     }
 

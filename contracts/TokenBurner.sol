@@ -12,7 +12,7 @@ library TokenBurner {
     uint256 private constant PRECISION = 10**18;
 
     function calculateBurnAmount(BurnData storage data, uint256 value) internal view returns (uint256 valueToBurn) {
-
+        require(value > 0, "Cannot transfer amount of 0");
         // calculate the value to burn based on burn rate.
         valueToBurn = (value * data.burnRate*PRECISION/100/100) / PRECISION; 
 

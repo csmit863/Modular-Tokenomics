@@ -15,8 +15,6 @@ NEW IDEA: burn until total supply = x
 Defining business usecases:
 
 
-some things will inevitably overlap
-
 
 * incentivize participation
 * ensure utility & value
@@ -62,8 +60,7 @@ contract MyToken is ERC20, BurnOnTx, Demurrage {
         Demurrage(taxAddress)
         
         {
-            _mint(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, _initialSupply*10**decimals()/2);
-            _mint(0x70997970C51812dc3A010C7d01b50e0d17dc79C8, _initialSupply*10**decimals()/2);
+            _mint(msg.sender, _initialSupply*10**decimals());
             owner = msg.sender;
             emit contractCreated(msg.sender, _initialSupply*10**decimals());
         }

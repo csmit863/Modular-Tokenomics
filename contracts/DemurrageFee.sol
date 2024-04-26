@@ -21,7 +21,6 @@ abstract contract Demurrage is ERC20 {
 
     function claimDemurrageFee(address claimFrom) public {
         require(claimFrom != address(0), "Cannot claim from 0 address");
-        require(claimFrom != msg.sender, "Cannot claim from own address");
         require(balanceOf(claimFrom) > 0, "Nothing to claim, balance is 0");
         require(block.number - addressInfo[claimFrom].lastBlockTimeClaimed >= 1000, "Cannot claim fee, too early"); // doesnt work if block number is less than 1000 *fix*  
         uint256 claimFromBalance = balanceOf(claimFrom);
