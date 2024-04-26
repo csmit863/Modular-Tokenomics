@@ -7,11 +7,45 @@ import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
-contract MyToken is BurnOnTx, Demurrage {
+/*
+NEW IDEA: burn until total supply = x
+          allow staking until total supply = y
 
-    event contractCreated(address creator,uint totalSupply);
 
-    uint8 private decimalPlaces;
+Defining business usecases:
+
+
+some things will inevitably overlap
+
+
+* incentivize participation
+* ensure utility & value
+* establish governance
+
+
+examples of varying use cases of modular tokenomics
+
+
+redeemable token based coupons
+    - simply redeem coupons using tokens, e.g. 10 tokens = 1 product
+    - may want to implement some features into this token, e.g. 
+
+event-specific tokens
+    - incentivize participation during an event, but not after
+
+accessing liquidity
+    - incentivize token holders to lend their tokens
+
+
+
+*/
+
+
+
+contract MyToken is ERC20, BurnOnTx, Demurrage {
+
+    event contractCreated(address creator, uint totalSupply);
+
     uint256 public someNumber = 10;
     address public owner;
 
@@ -19,31 +53,34 @@ contract MyToken is BurnOnTx, Demurrage {
         string memory _name, 
         string memory _symbol, 
         uint _initialSupply, 
-        uint8 _decimals,
         uint _initialBurnRate,
+        uint _initialBurnGoal,
         address taxAddress
         ) 
-        BurnOnTx(_initialBurnRate)
-        Demurrage(taxAddress)
         ERC20(_name, _symbol) 
+        BurnOnTx(_initialBurnRate, _initialBurnGoal)
+        Demurrage(taxAddress)
         
         {
-            decimalPlaces = _decimals;
             _mint(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266, _initialSupply*10**decimals()/2);
             _mint(0x70997970C51812dc3A010C7d01b50e0d17dc79C8, _initialSupply*10**decimals()/2);
             owner = msg.sender;
             emit contractCreated(msg.sender, _initialSupply*10**decimals());
         }
 
-    function decimals() public view override returns (uint8) {
-        return decimalPlaces;
-    }
     function transfer(address to, uint256 amount) public override(BurnOnTx, ERC20) returns (bool) {
         BurnOnTx.transfer(to, amount);
         return true;
+    }    
+    
+    function transferFrom(address from, address to, uint256 amount) public override(BurnOnTx, ERC20) returns (bool){
+        BurnOnTx.transferFrom(from, to, amount);
+        return true;
     }
+
 }
 
+// for now: forget about making it easy. just make the functionality work.
 
 /*
 Ideal final state:
