@@ -35,7 +35,7 @@ import "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
 abstract contract InflateOnStake {
 
-
+    /*
     using SafeERC20 for IERC20;
     IERC20 public immutable token;
 
@@ -54,8 +54,33 @@ abstract contract InflateOnStake {
     function totalRewards() external view returns (uint){
     }
 
+    // from hackernoon tutorial https://hackernoon.com/how-to-implement-a-stake-and-reward-contract-in-solidity
+    function _stake(address user, uint256 amount) internal {
+        _updateUserRewards(user);
+        totalStaked += amount;
+        userStake[user] += amount;
+        stakingToken.safeTransferFrom(user, address(this), amount);
+        emit Staked(user, amount);
+    }
+
+    function _unstake(address user, uint256 amount) internal {
+        _updateUserRewards(user);
+        totalStaked -= amount;
+        userStake[user] -= amount;
+        stakingToken.safeTransfer(user, amount);
+        emit Unstaked(user, amount);
+    }
+    
+    function _claim(address user, uint256 amount) internal {
+        uint256 rewardsAvailable = _updateUserRewards(msg.sender).accumulated;
+        accumulatedRewards[user].accumulated = (rewardsAvailable - amount).u128();
+
+        rewardTokens.safeTransfer(user, amount);
+        emit Claimed(user, amount);
+    }
+
     // function to stake tokens
     // function to mint tokens
-
+    */
 }
 
