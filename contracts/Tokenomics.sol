@@ -3,8 +3,8 @@ pragma solidity ^0.8.19;
 
 import "src/contracts/BurnOnTx.sol";
 import "src/contracts/DemurrageFee.sol";
+import "src/contracts/ExecuteAfterLockup.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 
 /*
@@ -40,7 +40,7 @@ accessing liquidity
 
 
 
-contract MyToken is ERC20, BurnOnTx, Demurrage {
+contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
 
     event contractCreated(address creator, uint totalSupply);
 
@@ -50,9 +50,9 @@ contract MyToken is ERC20, BurnOnTx, Demurrage {
     constructor(
         string memory _name, 
         string memory _symbol, 
-        uint _initialSupply, 
-        uint _initialBurnRate,
-        uint _initialBurnGoal,
+        uint256 _initialSupply, 
+        uint256 _initialBurnRate,
+        uint256 _initialBurnGoal,
         address taxAddress
         ) 
         ERC20(_name, _symbol) 
@@ -72,6 +72,10 @@ contract MyToken is ERC20, BurnOnTx, Demurrage {
     
     function transferFrom(address from, address to, uint256 amount) public override(BurnOnTx, ERC20) returns (bool){
         BurnOnTx.transferFrom(from, to, amount);
+        return true;
+    }
+
+    function myFunction() executeAfterLockup public view returns (bool){
         return true;
     }
 
