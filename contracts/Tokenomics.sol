@@ -81,6 +81,17 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
 // for now: forget about making it easy. just make the functionality work.
 
 /*
