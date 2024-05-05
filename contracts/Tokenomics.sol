@@ -14,16 +14,11 @@ NEW IDEA: burn until total supply = x
 
 Defining business usecases:
 
-
-
 * incentivize participation
 * ensure utility & value
 * establish governance
 
-
-examples of varying use cases of modular tokenomics
-
-
+examples of varying use cases of modular tokenomics:
 redeemable token based coupons
     - simply redeem coupons using tokens, e.g. 10 tokens = 1 product
     - may want to implement some features into this token, e.g. 
@@ -31,10 +26,9 @@ redeemable token based coupons
 event-specific tokens
     - incentivize participation during an event, but not after
 
-accessing liquidity
+accessing liquidity{x for x in U if 12 % x == 0}
+
     - incentivize token holders to lend their tokens
-
-
 
 */
 
@@ -75,8 +69,10 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         return true;
     }
 
-    function myFunction() executeAfterLockup public view returns (bool){
-        return true;
+    // function myFuncWithCustomLockup() executeAfterLockup(params) publix view {}
+    
+    function myFunction() executeAfterLockup public returns (string memory){
+        return "Hello world";
     }
 
 }
@@ -84,17 +80,12 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
 
 
 
-
-
-
-
-
-
-
-
-// for now: forget about making it easy. just make the functionality work.
-
 /*
+
+constructor () {
+    token = ERC20(0x...);
+
+    
 Ideal final state:
 contract CallumCoin is ERC20, BurnOnTx, InflateWithStake, DemurrageFee {
 
