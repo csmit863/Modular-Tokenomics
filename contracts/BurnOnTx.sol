@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import "./TokenBurner.sol";
+import "./utils/TokenBurner.sol";
 
 abstract contract BurnOnTx is ERC20 {
 
@@ -29,18 +29,19 @@ abstract contract BurnOnTx is ERC20 {
     
     function transfer(address to, uint256 value) public override virtual returns (bool status) {  
         uint256 valueToBurn = burnData._calculateBurnAmount(value);
-        if (burnData.totalBurnt < burnData.burnGoal && valueToBurn > 0){ // check if this is needed
+        if (burnData.totalBurnt < burnData.burnGoal && valueToBurn > 0 || burnData.burnGoal == 0){ // check if this is needed
             _burn(msg.sender, valueToBurn);
             burnData.totalBurnt += valueToBurn;
             value -= valueToBurn;
         }
+        
         
         return super.transfer(to, value);
     }
 
     function transferFrom(address from, address to, uint256 value) public override virtual returns (bool status) {
         uint256 valueToBurn = burnData._calculateBurnAmount(value);
-        if (burnData.totalBurnt < burnData.burnGoal && valueToBurn > 0){
+        if (burnData.totalBurnt < burnData.burnGoal && valueToBurn > 0 || burnData.burnGoal == 0){ // check if this is needed
             _burn(from, valueToBurn);
             burnData.totalBurnt += valueToBurn;
             value -= valueToBurn;

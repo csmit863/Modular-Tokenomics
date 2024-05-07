@@ -43,7 +43,6 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
 
     event contractCreated(address creator, uint totalSupply);
 
-    uint256 public someNumber = 10;
     address public owner;
 
     constructor(
@@ -60,7 +59,6 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         BurnOnTx(_initialBurnRate, _initialBurnGoal)
         Demurrage(taxAddress)
         ExecuteAfterLockup(_lockupAmount, _lockupTime)
-        
         {
             _mint(msg.sender, _initialSupply*10**decimals());
             owner = msg.sender;

@@ -22,10 +22,6 @@ abstract contract ExecuteAfterLockup is ERC20 {
         lockupTime = _lockupTime;
     }
 
-    // what if there is a burn on every transfer?
-    // since this contract inherits from ERC20, we can use the internal
-    // function _transfer, which means we can bypass the token burns.
-
     event Lockup(address, uint256);
     event WithdrawLockup(address, uint256);
     event CompleteLockup(address, uint256);
@@ -35,6 +31,11 @@ abstract contract ExecuteAfterLockup is ERC20 {
         _;
     }
     
+    // could this be used to avoid demurrage? would demurrage break this?
+    // demurrage cannot be claimed from address(this)
+    // if demurrage and executeafterlockup are used in tandem,
+    // users are incentivized to lock their tokens in this contract to avoid
+    // the demurrage tax.
 
     function lockup() public {
         require(users[msg.sender].userAddr != msg.sender, "Already locked up");
@@ -70,6 +71,30 @@ abstract contract ExecuteAfterLockup is ERC20 {
 
 
 /* 
+what if there is a burn on every transfer?
+since this contract inherits from ERC20, we can use the internal
+function _transfer, which means we can bypass the token burns.
+
+
+Interestingly, this contract is a little bit tricky when trying to make it work
+with Demurrage.sol (and BurnOnTx). If the Demurrage and ExecuteAfterLockup contracts are used
+in tandem, then the rules of Demurrage.sol dictate that any user can 'tax' this
+address and claim the tokens that are locked up here. Then, when users go to
+cancel their lockup or complete their lockup, the address will not have enough
+tokens to compensate all users.
+
+
+
+One way to make it compatible would actually be to burn the tokens on lockup,
+and mint them once the lockup period is complete.
+
+This way, since the tokens have been burned, they would not be able to be taxed
+as they do not 'exist'. However, once the user completes their lockup or cancels
+their lockup, they will have their tokens back.
+
+
+
+
 create a function which requires users to lock up tokens
 for some amount of time. 
 After the lock up time has completed, users can call an execute
