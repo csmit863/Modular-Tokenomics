@@ -27,7 +27,7 @@ abstract contract ExecuteAfterLockup is ERC20 {
     event CompleteLockup(address, uint256);
 
     modifier executeAfterLockup(){
-        require(completeLockup(), "Condition not met");
+        require(_completeLockup(), "Condition not met");
         _;
     }
     
@@ -54,7 +54,7 @@ abstract contract ExecuteAfterLockup is ERC20 {
     }
 
     
-    function completeLockup() private returns (bool){ 
+    function _completeLockup() private returns (bool){ 
         require(users[msg.sender].userAddr != address(0), "Must lockup tokens");
         if(block.number-1000 >= users[msg.sender].startLock){
             // if user has completed stake

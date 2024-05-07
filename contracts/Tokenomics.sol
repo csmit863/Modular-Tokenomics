@@ -31,13 +31,10 @@ redeemable token based coupons
 event-specific tokens
     - incentivize participation during an event, but not after
 
-accessing liquidity{x for x in U if 12 % x == 0}
-
+accessing liquidity
     - incentivize token holders to lend their tokens
 
 */
-
-
 
 contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
 
@@ -49,9 +46,12 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         string memory _name, 
         string memory _symbol, 
         uint256 _initialSupply, 
+
         uint256 _initialBurnRate,
         uint256 _initialBurnGoal,
+
         address taxAddress,
+
         uint256 _lockupAmount,
         uint256 _lockupTime
         ) 

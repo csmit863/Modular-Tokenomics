@@ -25,12 +25,11 @@ abstract contract Demurrage is ERC20 {
         require(balanceOf(claimFrom) > 0, "Nothing to claim, balance is 0");
         require(block.number - addressInfo[claimFrom].lastBlockTimeClaimed >= 1000, "Cannot claim fee, too early"); 
         uint256 claimFromBalance = balanceOf(claimFrom);
-        _transfer(claimFrom, taxAddress, claimFromBalance/20 /* 5% */);
-        _transfer(claimFrom, msg.sender, claimFromBalance/100 /* 1% */);
+        _transfer(claimFrom, taxAddress, claimFromBalance/20 /* 5% */); // create % represented fee as variable set in constructor
+        _transfer(claimFrom, msg.sender, claimFromBalance/100 /* 1% */); // create % represented fee as variable set in constructor
         addressInfo[claimFrom].lastBlockTimeClaimed = block.number;
         emit DemurrageClaimed(claimFrom, msg.sender, claimFromBalance/20+claimFromBalance/100);
     }
-    
 }
 
 /*

@@ -14,4 +14,10 @@ exchanging the token as much as possible.
 
 Has a very high sybil attack risk.
 
+Different system? Or impose ID system?
+modifier isParticipant
+    require(valid_ID)
+    _;
+
 */
+
