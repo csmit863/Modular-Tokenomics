@@ -10,10 +10,17 @@ abstract contract ExecuteAfterLockup is ERC20 {
         uint256 startLock;
     }
 
-
     mapping(address => lockers) public users;
-    uint256 public lockupAmount = 100;
-    uint256 public lockupTime = 1000;
+
+
+    uint256 public lockupAmount; // in tokens
+    uint256 public lockupTime; // measured in blocks
+
+
+    constructor(uint256 _lockupAmount, uint256 _lockupTime){
+        lockupAmount = _lockupAmount;
+        lockupTime = _lockupTime;
+    }
 
     // what if there is a burn on every transfer?
     // since this contract inherits from ERC20, we can use the internal
@@ -23,12 +30,11 @@ abstract contract ExecuteAfterLockup is ERC20 {
     event WithdrawLockup(address, uint256);
     event CompleteLockup(address, uint256);
 
-    uint256 num1 = 1;
-
     modifier executeAfterLockup(){
         require(completeLockup(), "Condition not met");
         _;
     }
+    
 
     function lockup() public {
         require(users[msg.sender].userAddr != msg.sender, "Already locked up");
@@ -47,7 +53,7 @@ abstract contract ExecuteAfterLockup is ERC20 {
     }
 
     
-    function completeLockup() public returns (bool){
+    function completeLockup() private returns (bool){ 
         require(users[msg.sender].userAddr != address(0), "Must lockup tokens");
         if(block.number-1000 >= users[msg.sender].startLock){
             // if user has completed stake
@@ -59,9 +65,7 @@ abstract contract ExecuteAfterLockup is ERC20 {
             // if user has not completed stake
             revert("User has not completed stake");
         }
-        
     }
-    
 }
 
 

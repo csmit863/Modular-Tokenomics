@@ -12,6 +12,11 @@ NEW IDEA: burn until total supply = x
           allow staking until total supply = y
 
 
+adjustable inflation rates for InflateOnStake
+    -> for InflateOnStake, can people use this function to accrue their own liquidity?
+        -> yes, you could initialise the token contract by IERC20(token) and use
+           .customFunc() executeAfterLockup (?)
+
 Defining business usecases:
 
 * incentivize participation
@@ -47,11 +52,14 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         uint256 _initialSupply, 
         uint256 _initialBurnRate,
         uint256 _initialBurnGoal,
-        address taxAddress
+        address taxAddress,
+        uint256 _lockupAmount,
+        uint256 _lockupTime
         ) 
         ERC20(_name, _symbol) 
         BurnOnTx(_initialBurnRate, _initialBurnGoal)
         Demurrage(taxAddress)
+        ExecuteAfterLockup(_lockupAmount, _lockupTime)
         
         {
             _mint(msg.sender, _initialSupply*10**decimals());
@@ -68,8 +76,6 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         BurnOnTx.transferFrom(from, to, amount);
         return true;
     }
-
-    // function myFuncWithCustomLockup() executeAfterLockup(params) publix view {}
     
     function myFunction() executeAfterLockup public returns (string memory){
         return "Hello world";
@@ -101,4 +107,22 @@ contract CallumCoin is ERC20, BurnOnTx, InflateWithStake, DemurrageFee {
         burnOnTx.activated = False;
     }
 }
+
+Most projects, when explaining their tokenomics, typically include
+the distribution of their tokens initially, vesting periods, and finally
+a projected supply graph and a release schedule of tokens.
+
+But why stop there?
+
+It is easy enough to implement burns on transfers, but what else can be done?
+
+Libraries and standards exist (e.g. ERC-4626, OpenZeppelin contracts) which
+allow a developer to specify things such as vesting schedules. However, for
+more complex, nuanced and perhaps experimental tokenomics, there exist no
+standard libraries. 
+
+Because of this, innovation around tokenomics has somewhat stalled as, understandably,
+projects are not particularly willing to program their own tokenomics components at the 
+risk of exposing their protocol to security vulnerabilities. 
+
 */
