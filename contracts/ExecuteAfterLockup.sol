@@ -39,7 +39,8 @@ abstract contract ExecuteAfterLockup is ERC20 {
     // to maximise the usage of the token.
 
 
-    // why make this function virtual?
+    // This function will be internal as it is intended to be used within another custom
+    // function.
     // The developer may want to allow something such as a vote to occur, and as a result
     // the user must lock up tokens. 
     function _lockup() internal { 
@@ -51,7 +52,7 @@ abstract contract ExecuteAfterLockup is ERC20 {
         emit Lockup(msg.sender, lockupAmount);
     }
 
-    // this function must also be internal and virtual so that the developer can implement any
+    // this function must also be internal so that the developer can implement any
     // required cancel functionality, or not. For example locking up could either be an irreversible
     // decision such as after a vote is cast. Or, for example, alternative checks could be implemented 
     // to ensure that cancelling is possible, but only up to a certain block number.
