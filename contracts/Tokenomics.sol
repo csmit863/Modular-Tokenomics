@@ -6,6 +6,7 @@ import "src/contracts/DemurrageFee.sol";
 import "src/contracts/ExecuteAfterLockup.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import "forge-std/console.sol";
 
 /*
 NEW IDEA: burn until total supply = x
@@ -33,7 +34,6 @@ event-specific tokens
 
 accessing liquidity
     - incentivize token holders to lend their tokens
-
 */
 
 contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
@@ -50,14 +50,15 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         uint256 _initialBurnRate,
         uint256 _initialBurnGoal,
 
-        address taxAddress,
+        address _taxAddress,
+        uint256 _demurragePeriod,
 
         uint256 _lockupAmount,
         uint256 _lockupTime
         ) 
         ERC20(_name, _symbol) 
         BurnOnTx(_initialBurnRate, _initialBurnGoal)
-        Demurrage(taxAddress)
+        Demurrage(_taxAddress, _demurragePeriod)
         ExecuteAfterLockup(_lockupAmount, _lockupTime)
         {
             _mint(msg.sender, _initialSupply*10**decimals());
@@ -74,9 +75,23 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         BurnOnTx.transferFrom(from, to, amount);
         return true;
     }
-    
-    function myFunction() executeAfterLockup public returns (string memory){
-        return "Hello world";
+
+    function lockAndVote() public {
+        // any requirements can go here
+        console.log("Vote cast");
+        _lockup();
+    }
+
+    function cancelVote() public {
+        //any requirements can go here
+        console.log("Vote cancelled");
+        _cancelLockup();
+    }
+
+    // execute a vote, requires a lock up, then complete the lock up 
+    // after 1000 blocks
+    function myFunction() executeAfterLockup public {
+        console.log("Hello world, executed after lockup");
     }
 
 }
@@ -85,26 +100,6 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
 
 
 /*
-
-constructor () {
-    token = ERC20(0x...);
-
-    
-Ideal final state:
-contract CallumCoin is ERC20, BurnOnTx, InflateWithStake, DemurrageFee {
-
-    constructor(
-        *args for components*
-    ) ERC20() BurnOnTx() InflateWithStake() DemurrageFee()
-    {
-        *things to execute on start*
-        
-    }
-
-    function mySpecialFunction() public onlyOwner {
-        burnOnTx.activated = False;
-    }
-}
 
 Most projects, when explaining their tokenomics, typically include
 the distribution of their tokens initially, vesting periods, and finally

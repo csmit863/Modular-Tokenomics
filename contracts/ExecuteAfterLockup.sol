@@ -35,9 +35,14 @@ abstract contract ExecuteAfterLockup is ERC20 {
     // demurrage cannot be claimed from address(this)
     // if demurrage and executeafterlockup are used in tandem,
     // users are incentivized to lock their tokens in this contract to avoid
-    // the demurrage tax.
+    // the demurrage tax. This inadvertently achieves the goal of demurrage which is
+    // to maximise the usage of the token.
 
-    function lockup() public {
+
+    // why make this function virtual?
+    // The developer may want to allow something such as a vote to occur, and as a result
+    // the user must lock up tokens. 
+    function _lockup() internal { 
         require(users[msg.sender].userAddr != msg.sender, "Already locked up");
         approve(msg.sender, lockupAmount);
         _transfer(msg.sender, address(this), lockupAmount);
@@ -46,17 +51,22 @@ abstract contract ExecuteAfterLockup is ERC20 {
         emit Lockup(msg.sender, lockupAmount);
     }
 
-    function cancelLockup() public {
+    // this function must also be internal and virtual so that the developer can implement any
+    // required cancel functionality, or not. For example locking up could either be an irreversible
+    // decision such as after a vote is cast. Or, for example, alternative checks could be implemented 
+    // to ensure that cancelling is possible, but only up to a certain block number.
+    function _cancelLockup() internal {
         require(users[msg.sender].userAddr == msg.sender, "Nothing to cancel");
         _transfer(address(this), msg.sender, lockupAmount);
         users[msg.sender].userAddr = address(0);
         emit WithdrawLockup(msg.sender, lockupAmount);
     }
 
-    
+    // this is private because it is for use within the modifier.
     function _completeLockup() private returns (bool){ 
         require(users[msg.sender].userAddr != address(0), "Must lockup tokens");
-        if(block.number-1000 >= users[msg.sender].startLock){
+        require(block.number > lockupTime, "Too early to claim"); // prevents arithmetic underflow
+        if(block.number-lockupTime >= users[msg.sender].startLock){ // arithmetic underflow
             // if user has completed stake
             _transfer(address(this), msg.sender, lockupAmount);
             users[msg.sender].userAddr = address(0);
@@ -64,7 +74,8 @@ abstract contract ExecuteAfterLockup is ERC20 {
             return true;
         } else {
             // if user has not completed stake
-            revert("User has not completed stake");
+            return false;
+            //revert("User has not completed stake");
         }
     }
 }

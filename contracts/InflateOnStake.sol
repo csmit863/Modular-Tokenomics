@@ -26,9 +26,9 @@ inflateOnStake.getBalanceOf(address(this))
 inflateOnStake.getLastUpdated(address(this))
 
 
-Start with a basic stake + mint contract where a depositor can accrue rewards
 
 */
+// Source:
 // https://github.com/alcueca/staking/blob/b9349f3af585c03121c3627a57e0d4312c913c14/src/SimpleRewards.sol
 
 // SPDX-License-Identifier: AGPL-3.0-only

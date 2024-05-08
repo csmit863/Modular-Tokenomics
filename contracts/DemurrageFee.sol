@@ -10,20 +10,22 @@ abstract contract Demurrage is ERC20 {
         address holderAddress;
         uint256 lastBlockTimeClaimed;
     }
+    uint256 demurragePeriod;
 
     event DemurrageClaimed(address holder, address claimer, uint amountClaimed);
 
     mapping(address => addresses) public addressInfo;
 
-    constructor(address _taxAddress){
+    constructor(address _taxAddress, uint256 _demurragePeriod){
         taxAddress = _taxAddress;
+        demurragePeriod = _demurragePeriod;
     }
 
     function claimDemurrageFee(address claimFrom) public {
         require(claimFrom != address(0), "Cannot claim from 0 address");
         require(claimFrom != address(this), "Cannot claim from contract address");
         require(balanceOf(claimFrom) > 0, "Nothing to claim, balance is 0");
-        require(block.number - addressInfo[claimFrom].lastBlockTimeClaimed >= 1000, "Cannot claim fee, too early"); 
+        require(block.number - addressInfo[claimFrom].lastBlockTimeClaimed >= demurragePeriod, "Cannot claim fee, too early"); 
         uint256 claimFromBalance = balanceOf(claimFrom);
         _transfer(claimFrom, taxAddress, claimFromBalance/20 /* 5% */); // create % represented fee as variable set in constructor
         _transfer(claimFrom, msg.sender, claimFromBalance/100 /* 1% */); // create % represented fee as variable set in constructor
