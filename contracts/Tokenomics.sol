@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 import "src/contracts/BurnOnTx.sol";
 import "src/contracts/DemurrageFee.sol";
 import "src/contracts/ExecuteAfterLockup.sol";
+import "src/contracts/DisperseOnTx.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "forge-std/console.sol";
@@ -36,36 +37,58 @@ accessing liquidity
     - incentivize token holders to lend their tokens
 */
 
-contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
+contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, DisperseOnTx {
 
     event contractCreated(address creator, uint totalSupply);
 
     address public owner;
 
+    struct BurnSettings {
+        uint256 initialBurnRate;
+        uint256 initialBurnGoal;
+    }
+    struct DemurrageSettings {
+        address taxAddress;
+        uint256 demurragePeriod;
+        uint256 taxAmount;
+        uint256 incentiveAmount;
+    }
+
+    struct LockupSettings {
+        uint256 lockupAmount;
+        uint256 lockupTime;
+    }
+
     constructor(
         string memory _name, 
         string memory _symbol, 
         uint256 _initialSupply, 
-
-        uint256 _initialBurnRate,
-        uint256 _initialBurnGoal,
-
-        address _taxAddress,
-        uint256 _demurragePeriod,
-
-        uint256 _lockupAmount,
-        uint256 _lockupTime
+        BurnSettings memory _burnSettings,
+        DemurrageSettings memory _demurrageSettings,
+        LockupSettings memory _lockupSettings
         ) 
         ERC20(_name, _symbol) 
-        BurnOnTx(_initialBurnRate, _initialBurnGoal)
-        Demurrage(_taxAddress, _demurragePeriod)
-        ExecuteAfterLockup(_lockupAmount, _lockupTime)
+        BurnOnTx(
+            _burnSettings.initialBurnRate, 
+            _burnSettings.initialBurnGoal
+            )
+        Demurrage(
+            _demurrageSettings.taxAddress, 
+            _demurrageSettings.demurragePeriod, 
+            _demurrageSettings.taxAmount, 
+            _demurrageSettings.incentiveAmount
+            )
+        ExecuteAfterLockup(
+            _lockupSettings.lockupAmount, 
+            _lockupSettings.lockupTime
+            )
         {
             _mint(msg.sender, _initialSupply*10**decimals());
             owner = msg.sender;
             emit contractCreated(msg.sender, _initialSupply*10**decimals());
         }
 
+    // BurnOnTx
     function transfer(address to, uint256 amount) public override(BurnOnTx, ERC20) returns (bool) {
         BurnOnTx.transfer(to, amount);
         return true;
@@ -76,8 +99,10 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         return true;
     }
 
+    // ExecuteAfterLockup stuff
     function lockAndVote() public {
         // any requirements can go here
+        // cast a vote?
         console.log("Vote cast");
         _lockup();
     }
@@ -88,11 +113,24 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup {
         _cancelLockup();
     }
 
-    // execute a vote, requires a lock up, then complete the lock up 
+    // e.g. execute a vote, requires a lock up, then complete the lock up 
     // after 1000 blocks
     function myFunction() executeAfterLockup public {
         console.log("Hello world, executed after lockup");
     }
+
+    // DisperseOnTx stuff
+    
+    uint256 public buyInAmount = 100;
+
+    function addToLottery() public {
+        _addToLottery(buyInAmount);
+    }
+
+    function drawLottery() public {
+        _drawLottery();
+    }
+
 
 }
 

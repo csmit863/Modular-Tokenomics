@@ -1,5 +1,59 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
+import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+
+/*
+
+Two challenges:
+
+Introducing sybil resistance
+ - ID system with internal func implementation
+Generating a truly random number
+ - (TEMPORARY, NOT SECURE) using hash function + prevrandao (difficulty), for future reference use on chain oracle for maximum randomness.
+ - https://blog.chain.link/random-number-generation-solidity/
+ - Chainlink VRF
+*/
+
+abstract contract DisperseOnTx is ERC20 {
+    
+    constructor(){
+        lotteryPool = 0;
+    }
+
+    uint256 lotteryPool;
+
+    address[] private participants;
+
+    function getRandomIndex() private view returns (uint256){
+        // FOR FUTURE REFERENCE: CALL CHAINLINK VRF
+        uint256 randomIndex = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty, participants.length))) % participants.length;
+        return randomIndex;
+    }
+
+    function _selectRandomWinner() private view returns (address){ 
+        require(participants.length > 0, "No participants in the lottery");
+        uint256 randomIndex = getRandomIndex(); 
+        return participants[randomIndex];
+    }
+
+    function _addToLottery(uint256 amount) internal {
+        _transfer(msg.sender, address(this), amount);
+        participants.push(msg.sender);
+        lotteryPool += amount;
+    }
+
+    function _drawLottery() internal {
+        address winner = _selectRandomWinner();
+        _transfer(address(this), winner, lotteryPool);
+        lotteryPool = 0;
+        delete participants;
+    }
+
+}
+
+// https://codedamn.com/news/solidity/how-to-generate-random-numbers-in-solidity
+
+
 
 /*
 
@@ -10,14 +64,17 @@ Every x blocks the contents of the prize pool will be distributed
 to users who transacted the token.
 
 The money doesnt lose/gain value, but there is a benefit to users
-exchanging the token as much as possible.
+exchanging the token. 
 
 Has a very high sybil attack risk.
 
 Different system? Or impose ID system?
-modifier isParticipant
-    require(valid_ID)
-    _;
+Impose ID system through implementing internal functions in inherited contract.
+For example:
+
+function myFunc() public {
+    require(validID);
+    _addToLottery();
+}
 
 */
-

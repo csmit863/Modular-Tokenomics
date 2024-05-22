@@ -5,20 +5,27 @@ import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 
 abstract contract Demurrage is ERC20 {
 
+    
     address public taxAddress;
+    uint256 public demurragePeriod;
+    uint256 public taxAmount = 500; // default in basis points
+    uint256 public incentiveAmount = 100; // default in basis points
+    
     struct addresses {
         address holderAddress;
         uint256 lastBlockTimeClaimed;
     }
-    uint256 demurragePeriod;
-
-    event DemurrageClaimed(address holder, address claimer, uint amountClaimed);
+    
+    event DemurrageClaimed(address holder, address claimer, uint256 amountTaxed, uint256 incentive);
 
     mapping(address => addresses) public addressInfo;
 
-    constructor(address _taxAddress, uint256 _demurragePeriod){
+    // allow for default values
+    constructor(address _taxAddress, uint256 _demurragePeriod, uint256 _taxAmount, uint256 _incentiveAmount){
         taxAddress = _taxAddress;
         demurragePeriod = _demurragePeriod;
+        taxAmount = _taxAmount;
+        incentiveAmount = _incentiveAmount;
     }
 
     function claimDemurrageFee(address claimFrom) public {
@@ -27,10 +34,14 @@ abstract contract Demurrage is ERC20 {
         require(balanceOf(claimFrom) > 0, "Nothing to claim, balance is 0");
         require(block.number - addressInfo[claimFrom].lastBlockTimeClaimed >= demurragePeriod, "Cannot claim fee, too early"); 
         uint256 claimFromBalance = balanceOf(claimFrom);
-        _transfer(claimFrom, taxAddress, claimFromBalance/20 /* 5% */); // create % represented fee as variable set in constructor
-        _transfer(claimFrom, msg.sender, claimFromBalance/100 /* 1% */); // create % represented fee as variable set in constructor
+
+        uint256 valueToTax = (claimFromBalance * taxAmount*10**18/100/100) / 10**18; 
+        uint256 valueToIncentive = (claimFromBalance * incentiveAmount*10**18/100/100) / 10**18; 
+
+        _transfer(claimFrom, taxAddress, valueToTax /* 5% */); // create % represented fee as variable set in constructor
+        _transfer(claimFrom, msg.sender, valueToIncentive /* 1% */); // create % represented fee as variable set in constructor
         addressInfo[claimFrom].lastBlockTimeClaimed = block.number;
-        emit DemurrageClaimed(claimFrom, msg.sender, claimFromBalance/20+claimFromBalance/100);
+        emit DemurrageClaimed(claimFrom, msg.sender, valueToTax, valueToIncentive);
     }
 }
 

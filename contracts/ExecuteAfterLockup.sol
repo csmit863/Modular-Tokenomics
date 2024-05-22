@@ -95,14 +95,13 @@ address and claim the tokens that are locked up here. Then, when users go to
 cancel their lockup or complete their lockup, the address will not have enough
 tokens to compensate all users.
 
-
-
 One way to make it compatible would actually be to burn the tokens on lockup,
 and mint them once the lockup period is complete.
 
 This way, since the tokens have been burned, they would not be able to be taxed
 as they do not 'exist'. However, once the user completes their lockup or cancels
 their lockup, they will have their tokens back.
+
 
 
 
