@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.3;
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import "forge-std/console.sol";
 
 /*
 
@@ -13,6 +14,8 @@ Generating a truly random number
  - https://blog.chain.link/random-number-generation-solidity/
  - Chainlink VRF
 */
+
+// lottery system with multiple tickets increasing the odds of winning
 
 abstract contract DisperseOnTx is ERC20 {
     
@@ -27,6 +30,7 @@ abstract contract DisperseOnTx is ERC20 {
     function getRandomIndex() private view returns (uint256){
         // FOR FUTURE REFERENCE: CALL CHAINLINK VRF
         uint256 randomIndex = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty, participants.length))) % participants.length;
+        console.log(randomIndex);
         return randomIndex;
     }
 
@@ -44,6 +48,7 @@ abstract contract DisperseOnTx is ERC20 {
 
     function _drawLottery() internal {
         address winner = _selectRandomWinner();
+        console.log("Winner:", winner);
         _transfer(address(this), winner, lotteryPool);
         lotteryPool = 0;
         delete participants;
@@ -76,5 +81,24 @@ function myFunc() public {
     require(validID);
     _addToLottery();
 }
+
+
+Future considerations:
+
+Limiting lottery entrants
+    bool limitEntrants = false;
+
+    modifier limitEntrant() {
+        if (limitEntrants) {
+            require(participants[msg.sender] == address(0), "Already in the lottery");
+            participants.push(msg.sender);
+            hasParticipated[msg.sender] = true; 
+        }
+        _;
+    }
+    function _addToLottery(uint256 amount) internal limitEntrant {
+        ...
+    }
+
 
 */
