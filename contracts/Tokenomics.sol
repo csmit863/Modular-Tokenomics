@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "src/contracts/BurnOnTx.sol";
 import "src/contracts/DemurrageFee.sol";
 import "src/contracts/ExecuteAfterLockup.sol";
-import "src/contracts/DisperseOnTx.sol";
+import "src/contracts/LotterySystem.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "forge-std/console.sol";
@@ -37,7 +37,7 @@ accessing liquidity
     - incentivize token holders to lend their tokens
 */
 
-contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, DisperseOnTx {
+contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, LotterySystem {
 
     event contractCreated(address creator, uint totalSupply);
 

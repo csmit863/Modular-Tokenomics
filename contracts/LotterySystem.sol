@@ -17,7 +17,7 @@ Generating a truly random number
 
 // lottery system with multiple tickets increasing the odds of winning
 
-abstract contract DisperseOnTx is ERC20 {
+abstract contract LotterySystem is ERC20 {
     
     constructor(){
         lotteryPool = 0;
