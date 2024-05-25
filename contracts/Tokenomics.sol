@@ -46,6 +46,7 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, LotterySyste
     struct BurnSettings {
         uint256 initialBurnRate;
         uint256 initialBurnGoal;
+        uint256 initialBurnUntil;
     }
     struct DemurrageSettings {
         address taxAddress;
@@ -70,7 +71,8 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, LotterySyste
         ERC20(_name, _symbol) 
         BurnOnTx(
             _burnSettings.initialBurnRate, 
-            _burnSettings.initialBurnGoal
+            _burnSettings.initialBurnGoal,
+            _burnSettings.initialBurnUntil
             )
         Demurrage(
             _demurrageSettings.taxAddress, 
