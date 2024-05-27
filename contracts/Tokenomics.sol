@@ -5,6 +5,7 @@ import "src/contracts/BurnOnTx.sol";
 import "src/contracts/DemurrageFee.sol";
 import "src/contracts/ExecuteAfterLockup.sol";
 import "src/contracts/LotterySystem.sol";
+import "src/contracts/InflateOnStake.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "forge-std/console.sol";
@@ -37,7 +38,7 @@ accessing liquidity
     - incentivize token holders to lend their tokens
 */
 
-contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, LotterySystem {
+contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, LotterySystem, InflateOnStake {
 
     event contractCreated(address creator, uint totalSupply);
 
@@ -60,13 +61,22 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, LotterySyste
         uint256 lockupTime;
     }
 
+    struct StakeSettings {
+        //ERC20 stakingToken_;
+        //ERC20 rewardsToken_; 
+        uint256 rewardsStart_; 
+        uint256 rewardsEnd_;
+        uint256 totalRewards;
+    }
+
     constructor(
         string memory _name, 
         string memory _symbol, 
         uint256 _initialSupply, 
         BurnSettings memory _burnSettings,
         DemurrageSettings memory _demurrageSettings,
-        LockupSettings memory _lockupSettings
+        LockupSettings memory _lockupSettings,
+        StakeSettings memory _stakeSettings
         ) 
         ERC20(_name, _symbol) 
         BurnOnTx(
@@ -84,8 +94,14 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, LotterySyste
             _lockupSettings.lockupAmount, 
             _lockupSettings.lockupTime
             )
+        InflateOnStake( 
+            _stakeSettings.rewardsStart_,
+            _stakeSettings.rewardsEnd_,
+            _stakeSettings.totalRewards
+        )
         {
             _mint(msg.sender, _initialSupply*10**decimals());
+            _mint(address(this), _stakeSettings.totalRewards); // mint the total rewards to self to distribute to stakers
             owner = msg.sender;
             emit contractCreated(msg.sender, _initialSupply*10**decimals());
         }
@@ -134,7 +150,67 @@ contract MyToken is ERC20, BurnOnTx, Demurrage, ExecuteAfterLockup, LotterySyste
     }
 
 
+    // inflate on stake stuff
+
+    /// @notice Stake tokens.
+    function stake(uint256 amount) public virtual
+    {
+        _stake(msg.sender, amount);
+    }
+
+
+    /// @notice Unstake tokens.
+    function unstake(uint256 amount) public virtual
+    {
+        _unstake(msg.sender, amount);
+    }
+
+    /// @notice Claim all rewards for the caller.
+    function claim() public virtual returns (uint256)
+    {
+        uint256 claimed = _updateUserRewards(msg.sender).accumulated;
+        _claim(msg.sender, claimed);
+        return claimed;
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -44,7 +44,7 @@ import "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 /// This is a rewriting of [Unipool.sol](https://github.com/k06a/Unipool/blob/master/contracts/Unipool.sol), modified for clarity and simplified.
 /// Careful if using non-standard ERC20 tokens, as they might break things.
 
-contract SimpleRewards {
+abstract contract InflateOnStake is ERC20 {
     using SafeERC20 for ERC20;
     using Cast for uint256;
 
@@ -64,21 +64,17 @@ contract SimpleRewards {
         uint128 checkpoint;                                         // RewardsPerToken the last time the user rewards were updated
     }
 
-    ERC20 public immutable stakingToken;                            // Token to be staked
     uint256 public totalStaked;                                     // Total amount staked
     mapping (address => uint256) public userStake;                  // Amount staked per user
 
-    ERC20 public immutable rewardsToken;                            // Token used as rewards
     uint256 public immutable rewardsRate;                           // Wei rewarded per second among all token holders
     uint256 public immutable rewardsStart;                          // Start of the rewards program
     uint256 public immutable rewardsEnd;                            // End of the rewards program       
     RewardsPerToken public rewardsPerToken;                         // Accumulator to track rewards per token
     mapping (address => UserRewards) public accumulatedRewards;     // Rewards accumulated per user
     
-    constructor(ERC20 stakingToken_, ERC20 rewardsToken_, uint256 rewardsStart_, uint256 rewardsEnd_, uint256 totalRewards)
+    constructor( uint256 rewardsStart_, uint256 rewardsEnd_, uint256 totalRewards)
     {
-        stakingToken = stakingToken_;
-        rewardsToken = rewardsToken_;
         rewardsStart = rewardsStart_;
         rewardsEnd = rewardsEnd_;
         rewardsRate = totalRewards / (rewardsEnd_ - rewardsStart_); // The contract will fail to deploy if end <= start, as it should
@@ -91,10 +87,10 @@ contract SimpleRewards {
         uint256 totalStaked_ = totalStaked;
 
         // No changes if the program hasn't started
-        if (block.timestamp < rewardsStart) return rewardsPerTokenOut;
+        if (block.number < rewardsStart) return rewardsPerTokenOut;
 
         // Stop accumulating at the end of the rewards interval
-        uint256 updateTime = block.timestamp < rewardsEnd ? block.timestamp : rewardsEnd;
+        uint256 updateTime = block.number < rewardsEnd ? block.number : rewardsEnd;
         uint256 elapsed = updateTime - rewardsPerTokenIn.lastUpdated;
         
         // No changes if no time has passed
@@ -152,7 +148,7 @@ contract SimpleRewards {
         _updateUserRewards(user);
         totalStaked += amount;
         userStake[user] += amount;
-        stakingToken.safeTransferFrom(user, address(this), amount);
+        _transfer(user, address(this), amount);
         emit Staked(user, amount);
     }
 
@@ -163,7 +159,7 @@ contract SimpleRewards {
         _updateUserRewards(user);
         totalStaked -= amount;
         userStake[user] -= amount;
-        stakingToken.safeTransfer(user, amount);
+        _transfer(address(this), user, amount);
         emit Unstaked(user, amount);
     }
 
@@ -176,31 +172,12 @@ contract SimpleRewards {
         accumulatedRewards[user].accumulated = (rewardsAvailable - amount).u128();
 
         // This line would panic if the contract doesn't have enough rewards tokens
-        rewardsToken.safeTransfer(user, amount);
+        _transfer(address(this), user, amount);
         emit Claimed(user, amount);
     }
 
 
-    /// @notice Stake tokens.
-    function stake(uint256 amount) public virtual
-    {
-        _stake(msg.sender, amount);
-    }
 
-
-    /// @notice Unstake tokens.
-    function unstake(uint256 amount) public virtual
-    {
-        _unstake(msg.sender, amount);
-    }
-
-    /// @notice Claim all rewards for the caller.
-    function claim() public virtual returns (uint256)
-    {
-        uint256 claimed = _updateUserRewards(msg.sender).accumulated;
-        _claim(msg.sender, claimed);
-        return claimed;
-    }
 
     /// @notice Calculate and return current rewards per token.
     function currentRewardsPerToken() public view returns (uint256) {

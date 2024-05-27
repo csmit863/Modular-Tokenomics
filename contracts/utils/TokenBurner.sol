@@ -1,5 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
+import "forge-std/console.sol";
 
 library TokenBurner {
 
@@ -15,7 +16,6 @@ library TokenBurner {
     function _calculateBurnAmount(BurnData storage data, uint256 value) internal view returns (uint256 valueToBurn) {
         require(value > 0, "Cannot transfer amount of 0");
         // calculate the value to burn based on burn rate.
-        
 
         // check if a burnGoal has been set, and check the burnGoal has not been reached, and that burnUntil has not been reached or that it is non zero
         if (data.burnGoal > 0 && data.totalBurnt < data.burnGoal){
@@ -35,10 +35,11 @@ library TokenBurner {
         if (block.number > data.burnUntil && data.burnUntil > 0){
             valueToBurn = 0;
         } else {
-            valueToBurn = (value * data.burnRate*PRECISION/100/100) / PRECISION; 
+            valueToBurn = (value * data.burnRate*PRECISION/100/100) / PRECISION; // probably inefficient
         }
 
         // if the burnGoal is 0 do a regular burn 
+
         return valueToBurn;
     }
 }
