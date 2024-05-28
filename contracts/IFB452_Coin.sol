@@ -26,7 +26,7 @@ abstract contract IFB452_Coin is ERC20, Demurrage, BurnOnTx, ExecuteAfterLockup 
     constructor(string memory _name, string memory _symbol, uint256 _initialSupply)
     ERC20(_name, _symbol)
     Demurrage(address(1), _demurragePeriod, _taxAmount, _incentive)
-    BurnOnTx(_burnRate, 0, 0)
+    BurnOnTx(_burnRate, 10, 5)
     ExecuteAfterLockup(_lockupAmount, _lockupTime)
     {
         _mint(msg.sender, _initialSupply);

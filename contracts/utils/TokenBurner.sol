@@ -16,27 +16,30 @@ library TokenBurner {
     function _calculateBurnAmount(BurnData storage data, uint256 value) internal view returns (uint256 valueToBurn) {
         require(value > 0, "Cannot transfer amount of 0");
         // calculate the value to burn based on burn rate.
+        
+        uint256 _burnGoal = data.burnGoal;
+        uint256 _totalBurnt = data.totalBurnt;
+        uint256 _burnUntil = data.burnUntil;
+        uint256 _burnRate = data.burnRate;
+        valueToBurn = (value * _burnRate*PRECISION/100/100) / PRECISION; 
 
         // check if a burnGoal has been set, and check the burnGoal has not been reached, and that burnUntil has not been reached or that it is non zero
-        if (data.burnGoal > 0 && data.totalBurnt < data.burnGoal){
-
+        if ((valueToBurn==0) || (_burnGoal > 0 && _totalBurnt < _burnGoal)){
             // Burn at least one token if rounding causes zero
-            if (valueToBurn == 0 && data.totalBurnt+1 <= data.burnGoal) {
+            if ((valueToBurn == 0 && _totalBurnt+1 <= _burnGoal) || (_burnGoal == 0)) {
                 valueToBurn = 1; 
             }
 
             // Burn tokens up to the burn goal but not beyond
-            if (data.totalBurnt+valueToBurn > data.burnGoal) {
-                valueToBurn = data.burnGoal-data.totalBurnt; 
+            if ((_burnGoal > 0) && (_totalBurnt+valueToBurn > _burnGoal)) {
+                valueToBurn = _burnGoal-_totalBurnt; 
             }
 
         } 
 
-        if (block.number > data.burnUntil && data.burnUntil > 0){
+        if (block.number > _burnUntil && _burnUntil > 0){
             valueToBurn = 0;
-        } else {
-            valueToBurn = (value * data.burnRate*PRECISION/100/100) / PRECISION; // probably inefficient
-        }
+        } 
 
         // if the burnGoal is 0 do a regular burn 
 
