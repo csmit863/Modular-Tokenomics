@@ -6,6 +6,30 @@
 
 #### This project has the goal of allowing rapid iteration and experimentation of token models, as well as simplifying the process of developing tokenomics, enhancing security, and introducing gas optimizations where possible.
 
+### How to install:
+
+#### Start a foundry project
+```
+$ forge init <project name>
+```
+
+#### Install OpenZeppelin contracts
+```
+$ forge install OpenZeppelin/openzeppelin-contracts
+```
+
+#### Update OpenZeppelin contracts (refer to https://github.com/OpenZeppelin/openzeppelin-contracts/tree/master)
+```
+$ forge update
+```
+
+#### Install the Modular Tokenomics library
+```
+$ forge install rezahexe/Modular-Tokenomics
+```
+
+
+
 #### This contract implements 5 example modules:
 
 #### BurnOnTx
