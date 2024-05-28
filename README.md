@@ -18,11 +18,6 @@ $ forge init <project name>
 $ forge install OpenZeppelin/openzeppelin-contracts
 ```
 
-#### Update OpenZeppelin contracts (refer to https://github.com/OpenZeppelin/openzeppelin-contracts/tree/master)
-```
-$ forge update
-```
-
 #### Install the Modular Tokenomics library
 ```
 $ forge install rezahexe/Modular-Tokenomics
