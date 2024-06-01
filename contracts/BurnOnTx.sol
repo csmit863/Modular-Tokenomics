@@ -13,10 +13,6 @@ abstract contract BurnOnTx is ERC20 {
 
     TokenBurner.BurnData public burnData;
 
-    // burn goal
-    // set to something like 100? i.e. after 100 tokens have been burnt, stop burning tokens
-    // why? some founders want deflationary tokenomics on launch to get their project running
-
     constructor(uint256 _burnRate, uint256 _burnGoal, uint256 _burnUntil){
         burnData.burnRate = _burnRate;
         burnData.burnGoal = _burnGoal;
@@ -37,10 +33,6 @@ abstract contract BurnOnTx is ERC20 {
             burnData.totalBurnt += valueToBurn;
             value -= valueToBurn;
         }
-        //if (burnData.totalBurnt < burnData.burnGoal && valueToBurn > 0 || burnData.burnGoal == 0){ // check if this is needed
-            
-        
-        
         return super.transfer(to, value);
     }
 
